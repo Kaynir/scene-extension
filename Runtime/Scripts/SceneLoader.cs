@@ -65,12 +65,14 @@ namespace Kaynir.SceneExtension
         {
             yield return transition?.EnterRoutine();
             yield return loadingScreen.LoadRoutine(isAdditive);
+            yield return null;
 
             var asyncList = CreateAsyncList(operations);
 
             yield return LoadingProgressRoutine(asyncList);
             yield return SceneActivationRoutine(asyncList);
-
+            
+            yield return null;
             yield return loadingScreen.UnloadRoutine();
             yield return transition?.ExitRoutine();
 
