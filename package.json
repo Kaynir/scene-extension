@@ -1,0 +1,15 @@
+{
+  "name": "com.kaynir.scene-extension",
+  "version": "1.0.0",
+  "displayName": "Scene Extension",
+  "description": "An extension for smooth transitions between scenes.",
+  "unity": "2022.3",
+  "keywords": [
+    "scene, loading, transition"
+  ],
+  "author": {
+    "name": "Denis Znov",
+    "email": "kaynir.games@gmail.com",
+    "url": "https://github.com/Kaynir/scene-extension"
+  }
+}
