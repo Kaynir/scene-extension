@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -10,11 +12,9 @@ namespace Kaynir.SceneExtension.Tools
             return SceneManager.LoadSceneAsync(buildIndex, LoadSceneMode.Single);
         }
 
-        public static AsyncOperation LoadAdditive(int buildIndex, bool setActive = false)
+        public static AsyncOperation LoadAdditive(int buildIndex)
         {
-            AsyncOperation operation = SceneManager.LoadSceneAsync(buildIndex, LoadSceneMode.Additive);
-            if (setActive) operation.completed += (op) => SetActive(buildIndex);
-            return operation;
+            return SceneManager.LoadSceneAsync(buildIndex, LoadSceneMode.Additive);
         }
 
         public static AsyncOperation Unload(int buildIndex)
@@ -36,6 +36,19 @@ namespace Kaynir.SceneExtension.Tools
         public static bool IsLoaded(int buildIndex)
         {
             return GetScene(buildIndex).isLoaded;
+        }
+
+        public static List<AsyncOperation> GetLoadOperations(int[] buildIndexes)
+        {
+            return buildIndexes.Select((buildIndex, i) =>
+            {
+                AsyncOperation operation = i == 0
+                ? LoadSingle(buildIndex)
+                : LoadAdditive(buildIndex);
+
+                operation.allowSceneActivation = false;
+                return operation;
+            }).ToList();
         }
     }
 }

@@ -2,7 +2,7 @@
   "name": "com.kaynir.scene-extension",
   "version": "1.0.0",
   "displayName": "Scene Extension",
-  "description": "An extension for smooth transitions between scenes.",
+  "description": "An extension to handle smooth transitions between scenes.",
   "unity": "2022.3",
   "keywords": [
     "scene, loading, transition"

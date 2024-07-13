@@ -1,8 +1,8 @@
 using UnityEngine;
 
-namespace Kaynir.SceneExtension
+namespace Kaynir.SceneExtension.Tools
 {
-    public class PersistentObject : MonoBehaviour
+    public class PersistentGameObject : MonoBehaviour
     {
         private void Awake()
         {

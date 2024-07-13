@@ -1,8 +1,6 @@
-using UnityEngine;
-
 namespace Kaynir.SceneExtension.Transitions
 {
-    public abstract class FadeSource : MonoBehaviour
+    public abstract class FadeSource
     {
         public abstract void SetAlpha(float alpha);
     }

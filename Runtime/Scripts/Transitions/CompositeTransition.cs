@@ -1,25 +1,30 @@
-using System.Collections;
-using UnityEngine;
+using Cysharp.Threading.Tasks;
+using System.Threading;
 
 namespace Kaynir.SceneExtension.Transitions
 {
-    public class CompositeTransition : Transition
+    public class CompositeTransition : SceneTransition
     {
-        [SerializeField] private Transition[] transitions = null;
+        private readonly SceneTransition[] _sceneTransitions;
 
-        public override IEnumerator EnterRoutine()
+        public CompositeTransition(params SceneTransition[] sceneTransitions)
         {
-            for (int i = 0; i < transitions.Length; i++)
+            _sceneTransitions = sceneTransitions;
+        }
+
+        public override async UniTask FadeInTask(CancellationToken cancellationToken = default)
+        {
+            for (int i = 0; i < _sceneTransitions.Length; i++)
             {
-                yield return transitions[i].EnterRoutine();
+                await _sceneTransitions[i].FadeInTask(cancellationToken);
             }
         }
 
-        public override IEnumerator ExitRoutine()
+        public override async UniTask FadeOutTask(CancellationToken cancellationToken = default)
         {
-            for (int i = transitions.Length - 1; i >= 0 ; i--)
+            for (int i = _sceneTransitions.Length - 1; i >= 0; i--)
             {
-                yield return transitions[i].ExitRoutine();
+                await _sceneTransitions[i].FadeOutTask(cancellationToken);
             }
         }
     }

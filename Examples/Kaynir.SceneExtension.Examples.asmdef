@@ -1,8 +1,8 @@
 {
-    "name": "Kaynir.SceneExtension",
-    "rootNamespace": "Kaynir.SceneExtension",
+    "name": "Kaynir.SceneExtension.Examples",
+    "rootNamespace": "Kaynir.SceneExtension.Examples",
     "references": [
-        "GUID:f51ebe6a0ceec4240a699833d6309b23"
+        "GUID:bfb833ba05e026c4185b096a94ba1634"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
