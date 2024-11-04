@@ -1,7 +1,7 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
-using Cysharp.Threading.Tasks;
 using Kaynir.SceneExtension.Tools;
 using Kaynir.SceneExtension.Transitions;
 using UnityEngine;
@@ -10,63 +10,77 @@ namespace Kaynir.SceneExtension.Loaders
 {
     public class SceneLoader : ISceneLoader
     {
-        public event ISceneLoader.SceneAction LoadStartEvent;
-        public event ISceneLoader.SceneAction LoadProgressEvent;
-        public event ISceneLoader.SceneAction LoadEndEvent;
+        public const float MAX_ASYNC_PROGRESS = .9f;
 
-        private List<AsyncOperation> _operations;
+        public event ISceneLoader.SceneAction LoadStarted;
+        public event ISceneLoader.SceneAction LoadTicked;
+        public event ISceneLoader.SceneAction LoadEnded;
 
-        public SceneLoader()
+        private readonly List<AsyncOperation> _sceneOperations;
+        private readonly MonoBehaviour _parentBehaviour;
+
+        public SceneLoader(MonoBehaviour parentBehaviour)
         {
-            _operations = new();
+            _sceneOperations = new();
+            _parentBehaviour = parentBehaviour;
         }
 
-        public void LoadScene(ISceneTransition transition, CancellationToken token = default, params int[] buildIndexes)
+        public void LoadScene(int sceneBuildIndex, ISceneTransition sceneTransition, Action onBeforeExit = null)
         {
-            if (_operations.Any(operation => !operation.isDone))
+            LoadScenes(Enumerable.Empty<int>().Append(sceneBuildIndex), sceneTransition, onBeforeExit);
+        }
+
+        public void LoadScenes(IEnumerable<int> sceneBuildIndexes, ISceneTransition sceneTransition, Action onBeforeExit = null)
+        {
+            if (_sceneOperations.Any(operation => !operation.isDone))
             {
-                Debug.Log("<color=red>Loading is already in progress.</color>");
+                Debug.Log("<color=yellow>Loading is already in progress!</color>");
                 return;
             }
 
-            if (buildIndexes.Length == 0)
-                return;
-
-            _operations.Clear();
-            LoadSceneTask(transition, token, buildIndexes).Forget();
-        }
-
-        public void LoadScene(int buildIndex, ISceneTransition transition, CancellationToken token = default)
-        {
-            LoadScene(transition, token, buildIndex);
-        }
-
-        private async UniTaskVoid LoadSceneTask(ISceneTransition transition, CancellationToken token, int[] buildIndexes)
-        {
-            LoadStartEvent?.Invoke(buildIndexes[0], SceneConsts.MIN_PROGRESS);
-
-            await transition.FadeInTask(token);
-            await LoadOperationsTask(buildIndexes, token);
-            await transition.FadeOutTask(token);
-
-            LoadEndEvent?.Invoke(buildIndexes[0], SceneConsts.MAX_PROGRESS);
-        }
-
-        private async UniTask LoadOperationsTask(int[] buildIndexes, CancellationToken token)
-        {
-            _operations = SceneHelper.GetLoadOperations(buildIndexes);
-
-            float totalProgress = SceneConsts.MIN_PROGRESS;
-
-            while (totalProgress < SceneConsts.MAX_PROGRESS)
+            if (sceneBuildIndexes.Count() == 0)
             {
-                totalProgress = _operations.Average(operation => operation.progress);
-                totalProgress = Mathf.Clamp01(totalProgress / SceneConsts.MAX_ASYNC_PROGRESS);
-                LoadProgressEvent?.Invoke(buildIndexes[0], totalProgress);
-                await UniTask.Yield(PlayerLoopTiming.LastPostLateUpdate, token);
+                Debug.Log("<color=red>Unable to load empty scene collection!</color>");
+                return;
             }
 
-            _operations.ForEach(operation => operation.allowSceneActivation = true);
+            _parentBehaviour.StartCoroutine(LoadRoutine(sceneBuildIndexes, sceneTransition, onBeforeExit));
+        }
+
+        public void ReloadActiveScene(ISceneTransition sceneTransition, Action onLoadEnded = null)
+        {
+            LoadScene(SceneHelper.GetActiveSceneBuildIndex(), sceneTransition, onLoadEnded);
+        }
+
+        private IEnumerator LoadRoutine(IEnumerable<int> sceneBuildIndexes, ISceneTransition sceneTransition, Action onBeforeExit)
+        {
+            LoadStarted?.Invoke(sceneBuildIndexes.ElementAt(0), 0f);
+
+            //await transition.FadeInTask(token);
+            yield return LoadOperationRoutine(sceneBuildIndexes, onBeforeExit);
+            //await transition.FadeOutTask(token);
+
+            LoadEnded?.Invoke(sceneBuildIndexes.ElementAt(0), 1f);
+        }
+
+        private IEnumerator LoadOperationRoutine(IEnumerable<int> sceneBuildIndexes, Action onBeforeExit)
+        {
+            SceneHelper.CreateSceneOperations(sceneBuildIndexes, _sceneOperations);
+
+            float totalProgress = 0f;
+            int firstSceneBuildIndex = sceneBuildIndexes.First();
+
+            while (totalProgress < 1f)
+            {
+                totalProgress = _sceneOperations.Average(operation => operation.progress);
+                totalProgress = Mathf.Clamp01(totalProgress / MAX_ASYNC_PROGRESS);
+                LoadTicked?.Invoke(firstSceneBuildIndex, totalProgress);
+                yield return null;
+            }
+
+            onBeforeExit?.Invoke();
+            _sceneOperations.ForEach(operation => operation.allowSceneActivation = true);
+            _sceneOperations.Clear();
         }
     }
 }

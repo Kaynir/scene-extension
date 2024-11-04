@@ -16,7 +16,7 @@ namespace Kaynir.SceneExtension.Transitions
 
         public override void SetAlpha(float alpha)
         {
-            _canvas.enabled = alpha > SceneConsts.MIN_PROGRESS;
+            _canvas.enabled = alpha > 0f;
             _canvasGroup.alpha = alpha;
         }
     }

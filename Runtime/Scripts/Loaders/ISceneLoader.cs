@@ -1,5 +1,6 @@
 using Kaynir.SceneExtension.Transitions;
-using System.Threading;
+using System;
+using System.Collections.Generic;
 
 namespace Kaynir.SceneExtension.Loaders
 {
@@ -7,11 +8,23 @@ namespace Kaynir.SceneExtension.Loaders
     {
         delegate void SceneAction(int buildIndex, float progress);
         
-        event SceneAction LoadStartEvent;
-        event SceneAction LoadProgressEvent;
-        event SceneAction LoadEndEvent;
+        event SceneAction LoadStarted;
+        event SceneAction LoadTicked;
+        event SceneAction LoadEnded;
 
-        void LoadScene(ISceneTransition transition, CancellationToken token = default, params int[] buildIndexes);
-        void LoadScene(int buildIndex, ISceneTransition transition, CancellationToken token = default);
+        /// <summary>
+        /// Loads the scene in single mode with transition.
+        /// </summary>
+        void LoadScene(int sceneBuildIndex, ISceneTransition sceneTransition, Action onBeforeExit = null);
+
+        /// <summary>
+        /// Loads the scene collection with transition (first scene in single and others in additive mode).
+        /// </summary>
+        void LoadScenes(IEnumerable<int> sceneBuildIndexes, ISceneTransition sceneTransition, Action onBeforeExit = null);
+
+        /// <summary>
+        /// Reloads the current active scene in single mode with transition.
+        /// </summary>
+        void ReloadActiveScene(ISceneTransition sceneTransition, Action onBeforeExit = null);
     }
 }

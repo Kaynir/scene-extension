@@ -26,13 +26,13 @@ namespace Kaynir.SceneExtension.Examples
         {
             FadeSource fadeSource = new FadeCanvasGroup(fadeCanvas, fadeCanvasGroup);
 
-            _sceneLoader = new SceneLoader();
+            _sceneLoader = new SceneLoader(this);
             _sceneTransition = new FadeTransition(fadeSource, fadeInCurve, fadeOutCurve);
         }
 
         public void LoadScene(int buildIndex)
         {
-            _sceneLoader.LoadScene(buildIndex, _sceneTransition, destroyCancellationToken);
+            _sceneLoader.LoadScene(buildIndex, _sceneTransition);
         }
     }
 }

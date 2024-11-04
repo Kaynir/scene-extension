@@ -23,16 +23,16 @@ namespace Kaynir.SceneExtension.Transitions
         public override UniTask FadeInTask(CancellationToken cancellationToken = default)
         {
             _canvas.enabled = true;
-            _sceneLoader.LoadProgressEvent += OnProgressUpdated;
-            SetProgress(SceneConsts.MIN_PROGRESS);
+            _sceneLoader.LoadTicked += OnProgressUpdated;
+            SetProgress(0f);
             return UniTask.Yield(cancellationToken);
         }
 
         public override UniTask FadeOutTask(CancellationToken cancellationToken = default)
         {
             _canvas.enabled = false;
-            _sceneLoader.LoadProgressEvent -= OnProgressUpdated;
-            SetProgress(SceneConsts.MAX_PROGRESS);
+            _sceneLoader.LoadTicked -= OnProgressUpdated;
+            SetProgress(1f);
             return UniTask.Yield(cancellationToken);
         }
 
