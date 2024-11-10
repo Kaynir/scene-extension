@@ -3,7 +3,9 @@ guid: 91c5da7c5895ebb409a25f74cc95cc73
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - _fader: {instanceID: 0}
+  - _faderConfig: {fileID: 11400000, guid: 0b59d4e0353472442870db60fa017461, type: 2}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

@@ -17,20 +17,20 @@ namespace Kaynir.SceneExtension.Loaders
         public event ISceneLoader.SceneAction LoadEnded;
 
         private readonly List<AsyncOperation> _sceneOperations;
-        private readonly MonoBehaviour _parentBehaviour;
+        private readonly MonoBehaviour _parent;
 
-        public SceneLoader(MonoBehaviour parentBehaviour)
+        public SceneLoader(MonoBehaviour persistentParent)
         {
             _sceneOperations = new();
-            _parentBehaviour = parentBehaviour;
+            _parent = persistentParent;
         }
 
-        public void LoadScene(int sceneBuildIndex, ISceneTransition sceneTransition, Action onBeforeExit = null)
+        public void LoadScene(int sceneBuildIndex, ITransitionModule sceneTransition, Action onBeforeExit = null)
         {
             LoadScenes(Enumerable.Empty<int>().Append(sceneBuildIndex), sceneTransition, onBeforeExit);
         }
 
-        public void LoadScenes(IEnumerable<int> sceneBuildIndexes, ISceneTransition sceneTransition, Action onBeforeExit = null)
+        public void LoadScenes(IEnumerable<int> sceneBuildIndexes, ITransitionModule sceneTransition, Action onBeforeExit = null)
         {
             if (_sceneOperations.Any(operation => !operation.isDone))
             {
@@ -44,23 +44,25 @@ namespace Kaynir.SceneExtension.Loaders
                 return;
             }
 
-            _parentBehaviour.StartCoroutine(LoadRoutine(sceneBuildIndexes, sceneTransition, onBeforeExit));
+            _parent.StartCoroutine(LoadRoutine(sceneBuildIndexes, sceneTransition, onBeforeExit));
         }
 
-        public void ReloadActiveScene(ISceneTransition sceneTransition, Action onLoadEnded = null)
+        public void ReloadActiveScene(ITransitionModule sceneTransition, Action onLoadEnded = null)
         {
             LoadScene(SceneHelper.GetActiveSceneBuildIndex(), sceneTransition, onLoadEnded);
         }
 
-        private IEnumerator LoadRoutine(IEnumerable<int> sceneBuildIndexes, ISceneTransition sceneTransition, Action onBeforeExit)
+        private IEnumerator LoadRoutine(IEnumerable<int> sceneBuildIndexes, ITransitionModule sceneTransition, Action onBeforeExit)
         {
-            LoadStarted?.Invoke(sceneBuildIndexes.ElementAt(0), 0f);
+            LoadStarted?.Invoke(sceneBuildIndexes.First(), 0f);
 
-            //await transition.FadeInTask(token);
+            sceneTransition.Initialize(this);
+            yield return sceneTransition.FadeInRoutine(this);
             yield return LoadOperationRoutine(sceneBuildIndexes, onBeforeExit);
-            //await transition.FadeOutTask(token);
+            yield return sceneTransition.FadeOutRoutine(this);
+            sceneTransition.Clear(this);
 
-            LoadEnded?.Invoke(sceneBuildIndexes.ElementAt(0), 1f);
+            LoadEnded?.Invoke(sceneBuildIndexes.First(), 1f);
         }
 
         private IEnumerator LoadOperationRoutine(IEnumerable<int> sceneBuildIndexes, Action onBeforeExit)
