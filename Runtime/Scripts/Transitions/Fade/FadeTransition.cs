@@ -7,7 +7,7 @@ using UnityEngine;
 namespace Kaynir.SceneExtension.Transitions
 {
     [Serializable]
-    public abstract class FadeModule : TransitionModule
+    public abstract class FadeTransition : Transition
     {
         [SerializeField]
         private FadeConfig fadeConfig;

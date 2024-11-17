@@ -18,6 +18,7 @@ namespace Kaynir.SceneExtension.Loaders
 
         private readonly List<AsyncOperation> _sceneOperations;
         private readonly MonoBehaviour _parent;
+        private Func<bool> _waitActivation;
 
         public SceneLoader(MonoBehaviour persistentParent)
         {
@@ -25,12 +26,12 @@ namespace Kaynir.SceneExtension.Loaders
             _parent = persistentParent;
         }
 
-        public void LoadScene(int sceneBuildIndex, ITransitionModule sceneTransition, Action onBeforeExit = null)
+        public void LoadScene(int sceneBuildIndex, ITransition transition, Action onBeforeExit = null)
         {
-            LoadScenes(Enumerable.Empty<int>().Append(sceneBuildIndex), sceneTransition, onBeforeExit);
+            LoadScenes(Enumerable.Empty<int>().Append(sceneBuildIndex), transition, onBeforeExit);
         }
 
-        public void LoadScenes(IEnumerable<int> sceneBuildIndexes, ITransitionModule sceneTransition, Action onBeforeExit = null)
+        public void LoadScenes(IEnumerable<int> sceneBuildIndexes, ITransition transition, Action onBeforeExit = null)
         {
             if (_sceneOperations.Any(operation => !operation.isDone))
             {
@@ -44,23 +45,28 @@ namespace Kaynir.SceneExtension.Loaders
                 return;
             }
 
-            _parent.StartCoroutine(LoadRoutine(sceneBuildIndexes, sceneTransition, onBeforeExit));
+            _parent.StartCoroutine(LoadRoutine(sceneBuildIndexes, transition, onBeforeExit));
         }
 
-        public void ReloadActiveScene(ITransitionModule sceneTransition, Action onLoadEnded = null)
+        public void ReloadActiveScene(ITransition sceneTransition, Action onLoadEnded = null)
         {
             LoadScene(SceneHelper.GetActiveSceneBuildIndex(), sceneTransition, onLoadEnded);
         }
 
-        private IEnumerator LoadRoutine(IEnumerable<int> sceneBuildIndexes, ITransitionModule sceneTransition, Action onBeforeExit)
+        public void SetWaitActivation(Func<bool> waitActivation)
+        {
+            _waitActivation = waitActivation;
+        }
+
+        private IEnumerator LoadRoutine(IEnumerable<int> sceneBuildIndexes, ITransition transition, Action onBeforeExit)
         {
             LoadStarted?.Invoke(sceneBuildIndexes.First(), 0f);
 
-            sceneTransition.Initialize(this);
-            yield return sceneTransition.FadeInRoutine(this);
+            transition.Initialize(this);
+            yield return transition.FadeInRoutine(this);
             yield return LoadOperationRoutine(sceneBuildIndexes, onBeforeExit);
-            yield return sceneTransition.FadeOutRoutine(this);
-            sceneTransition.Clear(this);
+            yield return transition.FadeOutRoutine(this);
+            transition.Clear(this);
 
             LoadEnded?.Invoke(sceneBuildIndexes.First(), 1f);
         }
@@ -80,9 +86,24 @@ namespace Kaynir.SceneExtension.Loaders
                 yield return null;
             }
 
+            yield return WaitActivationRoutine();
+
             onBeforeExit?.Invoke();
             _sceneOperations.ForEach(operation => operation.allowSceneActivation = true);
             _sceneOperations.Clear();
+        }
+
+        private IEnumerator WaitActivationRoutine()
+        {
+            if (_waitActivation == null)
+            {
+                yield break;
+            }
+
+            while (_waitActivation())
+            {
+                yield return null;
+            }
         }
     }
 }

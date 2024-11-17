@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Kaynir.SceneExtension.Transitions
 {
-    public class TransitionSequence : MonoBehaviour, ITransitionModule
+    public class TransitionSequence : MonoBehaviour, ITransition
     {
         private enum ContextType { Persistant, Scene }
 
@@ -13,7 +13,7 @@ namespace Kaynir.SceneExtension.Transitions
         private ContextType context = ContextType.Persistant;
 
         [SerializeReference, DropdownOptions(false)]
-        private DropdownList<TransitionModule> modules = new();
+        private DropdownList<Transition> transitions = new();
 
         public void Initialize(ISceneLoader sceneLoader)
         {
@@ -33,19 +33,19 @@ namespace Kaynir.SceneExtension.Transitions
 
         public IEnumerator FadeInRoutine(ISceneLoader sceneLoader)
         {
-            for (int i = 0; i < modules.List.Count; i++)
+            for (int i = 0; i < transitions.List.Count; i++)
             {
-                modules.List[i].Initialize(sceneLoader);
-                yield return modules.List[i].FadeInRoutine(sceneLoader);
+                transitions.List[i].Initialize(sceneLoader);
+                yield return transitions.List[i].FadeInRoutine(sceneLoader);
             }
         }
 
         public IEnumerator FadeOutRoutine(ISceneLoader sceneLoader)
         {
-            for (int i = modules.List.Count - 1; i >= 0; i--)
+            for (int i = transitions.List.Count - 1; i >= 0; i--)
             {
-                yield return modules.List[i].FadeOutRoutine(sceneLoader);
-                modules.List[i].Clear(sceneLoader);
+                yield return transitions.List[i].FadeOutRoutine(sceneLoader);
+                transitions.List[i].Clear(sceneLoader);
             }
         }
     }

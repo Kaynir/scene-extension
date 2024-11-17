@@ -1,19 +1,20 @@
-﻿using Kaynir.SceneExtension.Loaders;
+using Kaynir.SceneExtension.Loaders;
+using System;
 using System.Collections;
 
 namespace Kaynir.SceneExtension.Transitions
 {
-    public abstract class ProgressModule : TransitionModule
+    [Serializable]
+    public abstract class WaitTransition : Transition
     {
         public override void Initialize(ISceneLoader sceneLoader)
         {
-            SetProgress(0f);
-            sceneLoader.LoadTicked += OnLoadTicked;
+            sceneLoader.SetWaitActivation(IsAwaitingActivation);
         }
 
         public override void Clear(ISceneLoader sceneLoader)
         {
-            sceneLoader.LoadTicked -= OnLoadTicked;
+            sceneLoader.SetWaitActivation(null);
         }
 
         public override IEnumerator FadeInRoutine(ISceneLoader sceneLoader)
@@ -26,11 +27,6 @@ namespace Kaynir.SceneExtension.Transitions
             yield break;
         }
 
-        protected abstract void SetProgress(float progress);
-
-        private void OnLoadTicked(int sceneBuildIndex, float progress)
-        {
-            SetProgress(progress);
-        }
+        protected abstract bool IsAwaitingActivation();
     }
 }

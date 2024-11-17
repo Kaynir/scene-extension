@@ -1,29 +1,29 @@
-﻿using Kaynir.SceneExtension.Loaders;
+using Kaynir.SceneExtension.Loaders;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace Kaynir.SceneExtension.Transitions
 {
-    public class ImageProgressModule : ProgressModule
+    public class SliderProgressTransition : ProgressTransition
     {
         [SerializeField]
-        private Image filledImage;
+        private Slider slider;
 
         public override void Initialize(ISceneLoader sceneLoader)
         {
             base.Initialize(sceneLoader);
-            filledImage.enabled = true;
+            slider.enabled = true;
         }
 
         public override void Clear(ISceneLoader sceneLoader)
         {
             base.Clear(sceneLoader);
-            filledImage.enabled = false;
+            slider.enabled = false;
         }
 
         protected override void SetProgress(float progress)
         {
-            filledImage.fillAmount = progress;
+            slider.value = Mathf.Lerp(slider.minValue, slider.maxValue, progress);
         }
     }
 }

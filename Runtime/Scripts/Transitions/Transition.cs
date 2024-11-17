@@ -5,7 +5,7 @@ using System.Collections;
 namespace Kaynir.SceneExtension.Transitions
 {
     [Serializable]
-    public abstract class TransitionModule : ITransitionModule
+    public abstract class Transition : ITransition
     {
         public abstract void Initialize(ISceneLoader sceneLoader);
         public abstract void Clear(ISceneLoader sceneLoader);

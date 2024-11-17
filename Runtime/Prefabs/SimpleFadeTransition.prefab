@@ -88,7 +88,7 @@ GameObject:
   - component: {fileID: 6316580189076672243}
   - component: {fileID: 2772586690498857120}
   - component: {fileID: 2566506063765542396}
-  - component: {fileID: -3299997695425209980}
+  - component: {fileID: 8981241910737191167}
   m_Layer: 5
   m_Name: SimpleFadeTransition
   m_TagString: Untagged
@@ -191,7 +191,7 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
---- !u!114 &-3299997695425209980
+--- !u!114 &8981241910737191167
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -204,19 +204,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   context: 0
-  modules:
-    rid: 1000
+  transitions:
+    rid: 5381738114894790734
   references:
     version: 2
     RefIds:
-    - rid: 1000
-      type: {class: 'DropdownList`1[[Kaynir.SceneExtension.Transitions.TransitionModule, Kaynir.SceneExtension]]',
+    - rid: 5381738114894790734
+      type: {class: 'DropdownList`1[[Kaynir.SceneExtension.Transitions.Transition, Kaynir.SceneExtension]]',
         ns: Kaynir.Inspector, asm: Kaynir.Inspector}
       data:
         List:
-        - rid: 5381738023323697226
-    - rid: 5381738023323697226
-      type: {class: CanvasFadeModule, ns: Kaynir.SceneExtension.Transitions, asm: Kaynir.SceneExtension}
+        - rid: 5381738114894790736
+    - rid: 5381738114894790736
+      type: {class: CanvasFadeTransition, ns: Kaynir.SceneExtension.Transitions, asm: Kaynir.SceneExtension}
       data:
         fadeConfig: {fileID: 11400000, guid: 0b59d4e0353472442870db60fa017461, type: 2}
         canvas: {fileID: 2473364216606767481}

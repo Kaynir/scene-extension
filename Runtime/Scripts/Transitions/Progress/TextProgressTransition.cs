@@ -1,29 +1,35 @@
 using Kaynir.SceneExtension.Loaders;
+using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Kaynir.SceneExtension.Transitions
 {
-    public class SliderProgressModule : ProgressModule
+    public class TextProgressTransition : ProgressTransition
     {
         [SerializeField]
-        private Slider slider;
+        private TMP_Text textField;
+
+        [SerializeField]
+        private string textFormat = "{0}%";
+
+        [SerializeField]
+        private float valueMultiplier = 100f;
 
         public override void Initialize(ISceneLoader sceneLoader)
         {
             base.Initialize(sceneLoader);
-            slider.enabled = true;
+            textField.enabled = true;
         }
 
         public override void Clear(ISceneLoader sceneLoader)
         {
             base.Clear(sceneLoader);
-            slider.enabled = false;
+            textField.enabled = false;
         }
 
         protected override void SetProgress(float progress)
         {
-            slider.value = Mathf.Lerp(slider.minValue, slider.maxValue, progress);
+            textField.SetText(textFormat, progress * valueMultiplier);
         }
     }
 }

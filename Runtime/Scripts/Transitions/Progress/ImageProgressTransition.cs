@@ -1,35 +1,29 @@
-using Kaynir.SceneExtension.Loaders;
-using TMPro;
+﻿using Kaynir.SceneExtension.Loaders;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Kaynir.SceneExtension.Transitions
 {
-    public class TextProgressModule : ProgressModule
+    public class ImageProgressTransition : ProgressTransition
     {
         [SerializeField]
-        private TMP_Text textField;
-
-        [SerializeField]
-        private string textFormat = "{0}%";
-
-        [SerializeField]
-        private float valueMultiplier = 100f;
+        private Image filledImage;
 
         public override void Initialize(ISceneLoader sceneLoader)
         {
             base.Initialize(sceneLoader);
-            textField.enabled = true;
+            filledImage.enabled = true;
         }
 
         public override void Clear(ISceneLoader sceneLoader)
         {
             base.Clear(sceneLoader);
-            textField.enabled = false;
+            filledImage.enabled = false;
         }
 
         protected override void SetProgress(float progress)
         {
-            textField.SetText(textFormat, progress * valueMultiplier);
+            filledImage.fillAmount = progress;
         }
     }
 }

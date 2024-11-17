@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Kaynir.SceneExtension.Transitions
 {
     [Serializable]
-    public class CanvasFadeModule : FadeModule
+    public class CanvasFadeTransition : FadeTransition
     {
         [SerializeField]
         private Canvas canvas;

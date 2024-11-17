@@ -3,15 +3,15 @@ using System.Collections;
 
 namespace Kaynir.SceneExtension.Transitions
 {
-    public interface ITransitionModule
+    public interface ITransition
     {
         /// <summary>
-        /// Initializes transition module before fade in coroutine.
+        /// Initializes transition before fade in coroutine.
         /// </summary>
         void Initialize(ISceneLoader sceneLoader);
         
         /// <summary>
-        /// Clears transition module after fade out coroutine.
+        /// Clears transition after fade out coroutine.
         /// </summary>
         void Clear(ISceneLoader sceneLoader);
 
