@@ -1,41 +1,42 @@
-using Cysharp.Threading.Tasks;
-using System.Threading;
+using Kaynir.SceneExtension.Loaders;
+using Kaynir.SceneExtension.Tools;
+using System;
+using System.Collections;
 using UnityEngine;
 
-namespace Kaynir.SceneExtension.Transitions.Fade
+namespace Kaynir.SceneExtension.Transitions
 {
-    public class FadeTransition : SceneTransition
+    [Serializable]
+    public abstract class FadeTransition : Transition
     {
-        private readonly FadeSource _source;
-        private readonly BlendingCurve _fadeInCurve;
-        private readonly BlendingCurve _fadeOutCurve;
+        [SerializeField]
+        private FadeConfig fadeConfig;
 
-        public FadeTransition(FadeSource source, BlendingCurve fadeInCurve, BlendingCurve fadeOutCurve)
+        public override IEnumerator FadeInRoutine(ISceneLoader sceneLoader)
         {
-            _source = source;
-            _fadeInCurve = fadeInCurve;
-            _fadeOutCurve = fadeOutCurve;
+            yield return FadeRoutine(fadeConfig.FadeInCurve,
+                                     fadeConfig.FadeInDuration,
+                                     fadeConfig.DeltaTime);
         }
 
-        public override async UniTask FadeInTask(CancellationToken cancellationToken = default)
+        public override IEnumerator FadeOutRoutine(ISceneLoader sceneLoader)
         {
-            await FadeTask(_fadeInCurve, cancellationToken);
+            yield return FadeRoutine(fadeConfig.FadeOutCurve,
+                                     fadeConfig.FadeOutDuration,
+                                     fadeConfig.DeltaTime);
         }
 
-        public override async UniTask FadeOutTask(CancellationToken cancellationToken = default)
-        {
-            await FadeTask(_fadeOutCurve, cancellationToken);
-        }
+        public abstract void SetAlpha(float alpha);
 
-        private async UniTask FadeTask(BlendingCurve blendingCurve, CancellationToken cancellationToken = default)
+        private IEnumerator FadeRoutine(AnimationCurve curve, float seconds, float deltaTime)
         {
-            for (float t = 0f; t < blendingCurve.Seconds; t += Time.deltaTime)
+            for (float t = 0f; t < seconds; t += deltaTime)
             {
-                _source.SetAlpha(blendingCurve.Evaluate(t));
-                await UniTask.Yield(PlayerLoopTiming.LastPostLateUpdate, cancellationToken);
+                SetAlpha(curve.Evaluate(t / seconds));
+                yield return null;
             }
 
-            _source.SetAlpha(blendingCurve.EvaluateMax());
+            SetAlpha(curve.Evaluate(1f));
         }
     }
 }

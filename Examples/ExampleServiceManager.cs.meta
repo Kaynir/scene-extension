@@ -1,10 +1,11 @@
 fileFormatVersion: 2
-guid: f33056ff4480b894fbf29b32e5636131
+guid: 91c5da7c5895ebb409a25f74cc95cc73
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
   defaultReferences:
-  - faderConfig: {fileID: 11400000, guid: 0b59d4e0353472442870db60fa017461, type: 2}
+  - defaultTransitionPrefab: {fileID: 8981241910737191167, guid: aeccf0aae4f61894f874a498214c9a13,
+      type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

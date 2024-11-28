@@ -22,33 +22,24 @@ namespace Kaynir.SceneExtension.Tools
             return SceneManager.UnloadSceneAsync(buildIndex);
         }
 
-        public static Scene GetScene(int buildIndex)
+        public static int GetActiveSceneBuildIndex()
         {
-            return SceneManager.GetSceneByBuildIndex(buildIndex);
+            return SceneManager.GetActiveScene().buildIndex;
         }
 
-        public static bool SetActive(int buildIndex)
+        public static void CreateSceneOperations(IEnumerable<int> sceneBuildIndexes, List<AsyncOperation> operations)
         {
-            if (!IsLoaded(buildIndex)) return false;
-            return SceneManager.SetActiveScene(GetScene(buildIndex));
-        }
+            operations.Clear();
 
-        public static bool IsLoaded(int buildIndex)
-        {
-            return GetScene(buildIndex).isLoaded;
-        }
-
-        public static List<AsyncOperation> GetLoadOperations(int[] buildIndexes)
-        {
-            return buildIndexes.Select((buildIndex, i) =>
+            for (int i = 0; i < sceneBuildIndexes.Count(); i++)
             {
-                AsyncOperation operation = i == 0
-                ? LoadSingle(buildIndex)
-                : LoadAdditive(buildIndex);
+                operations.Add(i == 0
+                    ? LoadSingle(sceneBuildIndexes.ElementAt(i))
+                    : LoadAdditive(sceneBuildIndexes.ElementAt(i))
+                );
 
-                operation.allowSceneActivation = false;
-                return operation;
-            }).ToList();
+                operations[i].allowSceneActivation = false;
+            }
         }
     }
 }
