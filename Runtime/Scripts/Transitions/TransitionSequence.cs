@@ -7,10 +7,10 @@ namespace Kaynir.SceneExtension.Transitions
 {
     public class TransitionSequence : MonoBehaviour, ITransition
     {
-        private enum ContextType { Persistant, Scene }
+        private enum ContextType { Project, Scene }
 
         [SerializeField]
-        private ContextType context = ContextType.Persistant;
+        private ContextType context = ContextType.Project;
 
         [SerializeReference, DropdownOptions(false)]
         private DropdownList<Transition> transitions = new();
